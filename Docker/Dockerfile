@@ -1,5 +1,5 @@
-# Fetch ubuntu 20.04 LTS docker image
-FROM ubuntu:20.04
+# Fetch ubuntu 22.04 LTS docker image
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive 
 #[DEPRECATED] Make a copy of ubuntu apt repository before modifying it. 
@@ -62,8 +62,8 @@ RUN chmod a+rwx -R /usr/local/hadoop/
 #RUN echo 'hadoopuser:hadooppass' | chpasswd
 
 # Download and setup Apache Spark
-RUN curl -s "https://archive.apache.org/dist/spark/spark-2.2.1/spark-2.2.1-bin-hadoop2.7.tgz" | tar -xz -C /usr/local/ \
-    && ln -s /usr/local/spark-2.2.1-bin-hadoop2.7 /usr/local/spark \
+RUN curl -s "https://archive.apache.org/dist/spark/spark-3.3.2/spark-3.3.2-bin-hadoop2.tgz" | tar -xz  -C /usr/local/ \
+    && ln -s /usr/local/spark-3.3.2-bin-hadoop2 /usr/local/spark \
     && chmod a+rwx -R /usr/local/spark/
 ENV PATH="/usr/local/spark/bin:${PATH}"
 ENV SPARK_HOME /usr/local/spark
