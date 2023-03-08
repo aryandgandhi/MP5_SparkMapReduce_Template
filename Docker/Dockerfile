@@ -1,17 +1,9 @@
 # Fetch ubuntu 22.04 LTS docker image
 FROM ubuntu:22.04
 
-ENV DEBIAN_FRONTEND=noninteractive 
-#[DEPRECATED] Make a copy of ubuntu apt repository before modifying it. 
-#RUN mv /etc/apt/sources.list /sources.list
-#[DEPRECATED] Now change the default ubuntu apt repositry, which is VERY slow, to another mirror that is much faster. It assumes the host already has created a sources.list.
-#COPY sources.list /etc/apt/sources.list
-
-#uncomment this line to find the fastest ubuntu repository at the time. Probably overkill, so disabling for now
-#Note that this functionality is untested and might need debugging a bit.
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Update apt, and install Java + curl + wget on your ubuntu image.
-
 RUN apt-get update && \
     apt-get install -y \
     curl \
@@ -21,14 +13,13 @@ RUN apt-get update && \
     git \
     zip \
     unzip \
-    openjdk-8-jdk \
+    openjdk-17-jdk \
     python3 \
     && apt-get clean
 
-RUN curl -s "https://archive.apache.org/dist/hadoop/core/hadoop-2.9.2/hadoop-2.9.2.tar.gz" | tar -xz -C /usr/local/ \
-    && ln -s /usr/local/hadoop-2.9.2 /usr/local/hadoop \
+RUN curl -s "https://archive.apache.org/dist/hadoop/core/hadoop-3.3.4/hadoop-3.3.4.tar.gz" | tar -xz -C /usr/local/ \
+    && ln -s /usr/local/hadoop-3.3.4 /usr/local/hadoop \
     && chmod a+rwx -R /usr/local/hadoop/
-
 
 ENV HADOOP_PREFIX /usr/local/hadoop
 ENV HADOOP_COMMON_HOME /usr/local/hadoop
@@ -44,7 +35,7 @@ ENV PATH="/usr/local/hadoop/bin:${PATH}"
 # ARM64/aarch64: /usr/lib/jvm/java-8-openjdk-arm64
 # X84_64: /usr/lib/jvm/java-1.8.0-openjdk-amd64
 
-RUN if [ "$(uname -m)" = "x86_64" ]; then export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64; else export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-arm64; fi \
+RUN if [ "$(uname -m)" = "x86_64" ]; then export JAVA_HOME=/usr/lib/jvm/java-1.17.0-openjdk-amd64; else export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-arm64; fi \
     && export HADOOP_CLASSPATH=$JAVA_HOME/lib/tools.jar \
     && sed -i "/^export JAVA_HOME/ s:.*:export HADOOP_PREFIX=/usr/local/hadoop HADOOP_HOME=/usr/local/hadoop\n:" $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh \
     && sed -i "/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop/:" $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh \
@@ -55,22 +46,20 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then export JAVA_HOME=/usr/lib/jvm/java-1.8
 # RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop/:' $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
 
 
-RUN chmod a+rwx -R /usr/local/hadoop/
 #COPY autosu /usr/local/bin
 #RUN chmod 777 /usr/local/bin/autosu
 #RUN adduser hadoopuser --disabled-password --gecos ""
 #RUN echo 'hadoopuser:hadooppass' | chpasswd
 
 # Download and setup Apache Spark
-RUN curl -s "https://archive.apache.org/dist/spark/spark-3.3.2/spark-3.3.2-bin-hadoop2.tgz" | tar -xz  -C /usr/local/ \
-    && ln -s /usr/local/spark-3.3.2-bin-hadoop2 /usr/local/spark \
+RUN curl -s "https://archive.apache.org/dist/spark/spark-3.3.2/spark-3.3.2-bin-hadoop3.tgz" | tar -xz  -C /usr/local/ \
+    && ln -s /usr/local/spark-3.3.2-bin-hadoop3 /usr/local/spark \
     && chmod a+rwx -R /usr/local/spark/
 ENV PATH="/usr/local/spark/bin:${PATH}"
 ENV SPARK_HOME /usr/local/spark
 
 # Make vim nice
 RUN echo "set background=dark" >> ~/.vimrc
-
 ENV PYSPARK_PYTHON=python3
 
 COPY WordCount.java /etc/apt/WordCount.java
