@@ -57,14 +57,3 @@ ENV SPARK_HOME /usr/local/spark
 RUN echo "set background=dark" >> ~/.vimrc
 ENV PYSPARK_PYTHON=python3
 
-# grader part
-# Make a directory where your files will be stored
-# create directory for mp* grader
-RUN mkdir /grader /grader/MP5Grader
-COPY MP5Grader/ /grader/MP5Grader/
-
-COPY executeGrader.sh /grader/executeGrader.sh
-# Below commands copy the files that you need to put in your docker image
-RUN chmod a+rwx -R /grader/
-
-ENTRYPOINT ["./grader/executeGrader.sh"]
