@@ -41,14 +41,9 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then export JAVA_HOME=/usr/lib/jvm/java-1.2
     && echo "export JAVA_HOME=$JAVA_HOME" >> $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh \
     && echo "export JAVA_HOME=$JAVA_HOME" >> /root/.bashrc
 
-COPY auto* /usr/local/bin/
-RUN chmod 777 /usr/local/bin/auto*
-RUN adduser hadoopuser --disabled-password --gecos ""
-RUN echo 'hadoopuser:hadooppass' | chpasswd && usermod -aG sudo hadoopuser
-
 # Download and setup Apache Spark
-RUN curl -s "https://archive.apache.org/dist/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3.tgz" | tar -xz  -C /usr/local/ \
-    && ln -s /usr/local/spark-3.5.0-bin-hadoop3 /usr/local/spark \
+RUN curl -s "https://archive.apache.org/dist/spark/spark-3.5.1/spark-3.5.1-bin-hadoop3.tgz" | tar -xz  -C /usr/local/ \
+    && ln -s /usr/local/spark-3.5.1-bin-hadoop3 /usr/local/spark \
     && chmod a+rwx -R /usr/local/spark/
 ENV PATH="/usr/local/spark/bin:${PATH}"
 ENV SPARK_HOME /usr/local/spark
