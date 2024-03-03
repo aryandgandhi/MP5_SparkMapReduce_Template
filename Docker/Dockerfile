@@ -13,17 +13,33 @@ COPY TopWords.java /etc/apt/TopWords.java
 #Note that this functionality is untested and might need debugging a bit.
 
 # Update apt, and install Java + curl + wget on your ubuntu image.
-RUN \
-  apt-get update && \
-  apt-get install -y curl vim wget expect git zip unzip && \
-  apt-get install -y openjdk-8-jdk 
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update --fix-missing
+
+RUN apt-get install -y curl
+
+RUN apt-get install -y vim
+
+RUN apt-get install -y wget
+
+RUN apt-get install -y expect
+
+RUN apt-get install -y git
+
+RUN apt-get install -y zip
+
+RUN apt-get install -y unzip
+
+# Use the arm64 version of openjdk-8-jdk for arm64 architecture
+RUN if [ "$(uname -m)" = "x86_64" ]; then apt-get install -y openjdk-8-jdk; else apt-get install -y openjdk-8-jdk-headless; fi
 
 RUN \
   apt-get install -y python3 
   # && \
   #apt-get install -y python3-pip
 
-ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-arm64
 RUN curl -s "https://archive.apache.org/dist/hadoop/core/hadoop-2.9.2/hadoop-2.9.2.tar.gz" | tar -xz -C /usr/local/
 RUN cd /usr/local && ln -s ./hadoop-2.9.2 hadoop
 
